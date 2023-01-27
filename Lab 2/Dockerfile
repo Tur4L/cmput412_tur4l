@@ -1,6 +1,6 @@
 # parameters
 ARG REPO_NAME="cmput412_tur4l"
-ARG DESCRIPTION="CMPUT 412 Lab codes"
+ARG DESCRIPTION="lab2"
 ARG MAINTAINER="Tural Bakhtiyarli (tural@ualberta.ca)"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG ICON="cube"
