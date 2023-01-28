@@ -11,13 +11,13 @@ class MyPublisherNode(DTROS):
         # initialize the DTROS parent class
         super(MyPublisherNode, self).__init__(node_name=node_name, node_type=NodeType.GENERIC)
         # construct publisher
-        self.pub = rospy.Publisher('chatter', String, queue_size=10)
+        self.pub = rospy.Publisher('~chatter', String, queue_size=10)
 
     def run(self):
         # publish message every 1 second
         rate = rospy.Rate(1) # 1Hz
         while not rospy.is_shutdown():
-            message = "Hello World!"
+            message = "Hello from %s" % os.environ['VEHICLE_NAME']
             rospy.loginfo("Publishing message: '%s'" % message)
             self.pub.publish(message)
             rate.sleep()

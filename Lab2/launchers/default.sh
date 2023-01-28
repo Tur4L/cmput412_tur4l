@@ -13,9 +13,9 @@ dt-launchfile-init
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 # launching app
-roscore &
-sleep 5
-dt-exec rosrun my_package my_publisher_node.py
+#roscore &
+#sleep 5
+dt-exec roslaunch my_package multiple_nodes.launch veh:=$VEHICLE_NAME
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
