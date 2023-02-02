@@ -1,6 +1,3 @@
 <launch>
-
-    <node pkg="wheel_encoder" type="wheel_encoder.py" name="wheel_encoder_left" output="screen"/>
-    <node pkg="wheel_encoder" type="wheel_encoder.py" name="wheel_encoder_right" output="screen"/>
-
+    <node pkg="wheel_encoder" type="wheel_encoder.py" name="wheel_encoder" output="screen"/>
 </launch>

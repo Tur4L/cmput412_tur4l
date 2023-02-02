@@ -16,14 +16,15 @@ class OdometryNode(DTROS):
 
         # Initialize the DTROS parent class
         super(OdometryNode, self).__init__(node_name=node_name, node_type=NodeType.PERCEPTION)
+        
         self.veh_name = os.environ["VEHICLE_NAME"]
 
         # Get static parameters
         self._radius = rospy.get_param(f'/{self.veh_name}/kinematics_node/radius', 100)
 
         # Subscribing to the wheel encoders
-        self.sub_encoder_ticks_left = rospy.Subscriber(f'/{self.veh_name}/left_wheel_encoder_node', WheelEncoderStamped, self.cb_encoder_data,callback_args = "left",)
-        self.sub_encoder_ticks_right = rospy.Subscriber(f'/{self.veh_name}/right_wheel_encoder_node', WheelEncoderStamped, self.cb_encoder_data,callback_args = "right")
+        self.sub_encoder_ticks_left = rospy.Subscriber(f'/{self.veh_name}/left_wheel_encoder_node/tick', WheelEncoderStamped, self.cb_encoder_data,callback_args = "left",)
+        self.sub_encoder_ticks_right = rospy.Subscriber(f'/{self.veh_name}/right_wheel_encoder_node/tick', WheelEncoderStamped, self.cb_encoder_data,callback_args = "right")
         self.sub_executed_commands = rospy.Subscriber(f'/{self.veh_name}/wheels_driver_node/wheels_cmd_executed', WheelsCmdStamped, self.cb_executed_commands)
 
 
@@ -94,7 +95,7 @@ class OdometryNode(DTROS):
 
 
 if __name__ == '__main__':
-    node = OdometryNode(node_name='my_odometry_node')
+    node = OdometryNode(node_name='odometry_node')
     # Keep it spinning to keep the node alive
     rospy.spin()
     rospy.loginfo("wheel_encoder_node is up and running...")
