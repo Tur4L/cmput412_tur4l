@@ -1,0 +1,11 @@
+<package>
+  <name>wheel_encoder</name>
+  <version>0.1.0</version>
+  <description>
+	      Wheel encoder for Excersice 27
+  </description>
+  <maintainer email="tural@ualberta.ca">Tural Bakhtiyarli</maintainer>
+  <license>None</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>

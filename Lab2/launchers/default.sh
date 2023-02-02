@@ -15,7 +15,7 @@ dt-launchfile-init
 # launching app
 #roscore &
 #sleep 5
-dt-exec roslaunch my_package multiple_nodes.launch veh:=$VEHICLE_NAME
+roslaunch wheel_encoder encoder.launch
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
