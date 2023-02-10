@@ -1,3 +1,4 @@
 <launch>
-    <node pkg="wheel_encoder" type="wheel_encoder.py" name="wheel_encoder" output="screen"/>
+    <node pkg="move_robot" type="move_robot.py" name="drive" output="screen"/>
+    <node pkg="move_robot" type="odometry.py" name="odometry" output="screen"/>
 </launch>
