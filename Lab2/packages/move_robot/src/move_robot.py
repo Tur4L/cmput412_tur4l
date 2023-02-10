@@ -215,7 +215,7 @@ class DriverNode(DTROS):
 if __name__ == "__main__":
     driver = DriverNode("driver_node")
 
-    # driver.set_led_color("RED")
+    driver.set_led_color("RED")
     half_ang = math.pi * driver._robot_width_half * 0.5
     ang = math.pi * driver._robot_width_half
 
