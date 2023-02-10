@@ -13,9 +13,7 @@ dt-launchfile-init
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 # launching app
-#roscore &
-#sleep 5
-roslaunch wheel_encoder encoder.launch
+roslaunch move_robot move_robot.launch
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE

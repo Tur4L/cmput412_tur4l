@@ -215,4 +215,78 @@ class DriverNode(DTROS):
 if __name__ == "__main__":
     driver = DriverNode("driver_node")
 
+    # driver.set_led_color("RED")
+    half_ang = math.pi * driver._robot_width_half * 0.5
+    ang = math.pi * driver._robot_width_half
+
+    ### Lab 2 Part 1
+    # Straight line task
+    driver.move(2*math.pi*0.61, 0.6, 0.35)
+
+    time.sleep(2)
+    driver.move(0.4, -0.6, -0.6)
+    time.sleep(5)
+
+    # Roatation task
+    # driver.stop()
+    # time.sleep(2)
+    # driver.rotate(math.pi/2, 0.6, -0.6)
+    
+    ### Lab 2 Part 2
+    # TODO: ROS service to light the LED
+    
+    ### Uncomment below for running task for part 2 ###
+    # State 1.
+    # driver.set_led_color("RED")
+    # time.sleep(5)
+
+    #driver.move(1.25, 0.83, 0.8)
+    #driver.move(1.25, -.83, -.8)
+    # # State 2.
+    # driver.set_led_color("BLUE")
+    # driver.move(half_ang, 0.65, -0.65)
+    # driver.theta += math.pi/2
+    # for i in range(3):
+    #     driver.move(1, 0.62, 0.6)
+    #     if i < 2:
+    #         driver.move(half_ang, -0.65, 0.65, half_ang*0.3)
+    #         driver.theta += math.pi / 2
+
+    # # State 1.
+    # driver.set_led_color("RED")
+    # time.sleep(5)
+
+    # # State 3.
+    # driver.set_led_color("GREEN")
+    # driver.move(half_ang, -0.65, 0.65, 0.3*half_ang)
+    # driver.move(1, 0.62, 0.6)
+    # driver.move(ang, -0.65, 0.65)
+
+    # # State 1.
+    # driver.set_led_color("RED")
+    # time.sleep(5)
+    
+    # # State 4.
+    # driver.set_led_color("WHITE")
+    # driver.move(2*math.pi*0.61, 0.7, 0.45)
+
+    # driver.set_led_color("LIGHT_OFF")
+    # time.sleep(2)
+    # driver.set_led_color("GREEN")
+    # driver.move(half_ang, 0.55, -0.55)
+    # driver.set_led_color("RED")
+    # time.sleep(5)
+    # for i in range(4):
+    #     driver.set_led_color("BLUE")
+    #     driver.move(1, 0.6, 0.6)
+    #     driver.set_led_color("RED")
+    #     time.sleep(5)
+    #     if i < 3:
+    #         driver.set_led_color("GREEN")
+    #         driver.move(half_ang, -0.55, 0.55)
+    #         driver.set_led_color("RED")
+    #         time.sleep(5)
+    
+    # driver.set_led_color("WHITE")
+    # driver.move(ang, -0.55, 0.55)
     rospy.on_shutdown(driver.shutdown_hook)
