@@ -104,6 +104,7 @@ class DriverNode(DTROS):
         pattern: str
             String representing the color. By convention, it is fully capitalized.
         """
+        print("I AM WORKING")
         msg = String()
         msg.data = pattern
         self.srv_led(msg)
@@ -221,13 +222,22 @@ if __name__ == "__main__":
 
     ### Lab 2 Part 1
     # Straight line task
-    driver.move(2*math.pi*0.61, 0.6, 0.35)
 
-    time.sleep(2)
-    driver.move(0.4, -0.6, -0.6)
-    time.sleep(5)
+    #The robot stops after travalling 1.5 meters at the speed 0.8 for both wheels.
+    #The robot stops after travelling 1.35 meters at the speed of 0.3 for both wheels.
+    #The robot stops after travelling 1.6 meters at the speed of 1.3 for both wheels.
+    # driver.move(2*math.pi*0.61, 0.6, 0.35)
+
+    # time.sleep(2)
+    # driver.move(0.4, -0.6, -0.6)
+    # time.sleep(5)
 
     # Roatation task
+
+    #The robot moved 98 degrees travelling at the speeds 0.6 and -0.6
+    #The robot moved 187 degrees travelling at the speeds 1.3 and -1.3
+    #The robot moved 76 degrees travelling at the speeds 0.55 and -0.55
+    
     # driver.stop()
     # time.sleep(2)
     # driver.rotate(math.pi/2, 0.6, -0.6)
@@ -289,4 +299,5 @@ if __name__ == "__main__":
     
     # driver.set_led_color("WHITE")
     # driver.move(ang, -0.55, 0.55)
-    rospy.on_shutdown(driver.shutdown_hook)
+    # rospy.on_shutdown(driver.shutdown_hook)
+    rospy.spin()
