@@ -17,7 +17,7 @@ class OdometryNode(DTROS):
 
         # Static parameters 
         self.veh_name = os.environ["VEHICLE_NAME"]
-        self._radius = rospy.get_param(f"/{self.veh_name}/kinematics_node/radius",100)
+        self._radius = 0.0318
 
         # Variables
         self.orig_tick_left = None
@@ -26,7 +26,12 @@ class OdometryNode(DTROS):
         self.right_dir = 1
 
         # Subscribers
-        self.sub_encoder_ticks_left = rospy.Subscriber(f"/{self.veh_name}/left_wheel_encoder_node/tick",WheelEncoderStamped,self.cb_encoder_data,callback_args="left")
+        self.sub_encoder_ticks_left = rospy.Subscriber(
+            f"/{self.veh_name}/left_wheel_encoder_node/tick",
+            WheelEncoderStamped,
+            self.cb_encoder_data,
+            callback_args="left"
+        )
         self.sub_encoder_ticks_right = rospy.Subscriber(
             f"/{self.veh_name}/right_wheel_encoder_node/tick",
             WheelEncoderStamped,
@@ -63,6 +68,10 @@ class OdometryNode(DTROS):
         orig_tick = self.orig_tick_left if wheel == "left" else self.orig_tick_right
         delta_x = 2 * math.pi * self._radius * (abs(msg.data) - orig_tick) / msg.resolution
         delta_x *= self.left_dir if wheel == "left" else self.right_dir
+        if wheel == "left":
+            delta_x = delta_x * self.left_dir
+        else:
+            delta_x = delta_x * self.right_dir
                 
         # Update variables and publish to the appropriate topics
         if wheel == "left":
@@ -79,5 +88,5 @@ class OdometryNode(DTROS):
 
 
 if __name__ == "__main__":
-    odom_node = OdometryNode("odometry_node")
+    odom_node = OdometryNode("odometry")
     rospy.spin()

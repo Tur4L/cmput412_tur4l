@@ -13,7 +13,8 @@ dt-launchfile-init
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 # launching app
-roslaunch move_robot move_robot.launch
+dt-exec roslaunch move_robot move_robot.launch
+# dt-exec rosrun move_robot drive.py
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
