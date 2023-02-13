@@ -1,5 +1,5 @@
-#CMPUT 412
-#Tural Bakhtiyarli
+# CMPUT 412
+# Tural Bakhtiyarli
 
 Hello,
 
