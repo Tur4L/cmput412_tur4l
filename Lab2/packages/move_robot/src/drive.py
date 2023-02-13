@@ -271,7 +271,7 @@ if __name__ == "__main__":
     driver.set_led_color("BLUE")
     driver.move(half_ang, 0.6, -0.6, -half_ang*0.1)
     for i in range(3):
-        driver.move(1, 0.625, 0.6)
+        driver.move(1, 0.6, 0.6)
         if i < 2:
             rat = 0.2
             driver.move(half_ang, -0.45, 0.45, half_ang*rat)
@@ -283,7 +283,7 @@ if __name__ == "__main__":
     # State 3.
     driver.set_led_color("GREEN")
     driver.move(half_ang, -0.55, 0.55, 0.3*half_ang)
-    driver.move(1, 0.625, 0.6)
+    driver.move(1, 0.6, 0.6)
     driver.move(ang, -0.55, 0.55, -0.1*ang)
 
     # State 1.
@@ -292,8 +292,8 @@ if __name__ == "__main__":
     
     # State 4.
     driver.set_led_color("WHITE")
-    driver.move(0.05, 0.63, 0.6)
-    driver.move(2*math.pi*0.61, 0.7, 0.45)
+    driver.move(0.05, 0.6, 0.6)
+    driver.move(2*math.pi*0.6, 0.7, 0.45)
     
     print(f"Final world frame location, x: {driver.wf_x}, y: {driver.wf_y}, theta: {driver.wf_t}")
     rospy.on_shutdown(driver.shutdown_hook)
