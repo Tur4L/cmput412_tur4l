@@ -9,23 +9,20 @@ import os
 import subprocess
 import time
 
-import rosbag
 import rospy
 from std_msgs.msg import Float32, String
-
+from sensor_msgs.msg import Image,CompressedImage
 from duckietown.dtros import DTROS, NodeType
 from duckietown_msgs.msg import WheelsCmdStamped, Pose2DStamped
 from duckietown_msgs.srv import ChangePattern
 
 
-class DriverNode(DTROS):
+class Augmenter(DTROS):
     def __init__(
         self,
         node_name,
-        init_frame_bag_name,
-        world_frame_bag_name
     ):
-        super(DriverNode, self).__init__(
+        super(Augmenter, self).__init__(
             node_name=node_name,
             node_type=NodeType.GENERIC
         )
@@ -33,40 +30,25 @@ class DriverNode(DTROS):
         # Static variables
         self._veh = os.environ["VEHICLE_NAME"]
         self._rate = rospy.Rate(100)
+        self._map_name = ""
 
-        # Service client
-        rospy.wait_for_service(f"/{self._veh}/led_emitter_node/set_pattern")
-        
-        self.srv_led = rospy.ServiceProxy(
-            f"/{self._veh}/led_emitter_node/set_pattern",
-            ChangePattern
-        )
+        # Variables
+        self.image
 
         # Publisher
-        self.pub_vel = rospy.Publisher(
-            f"{self._veh}/wheels_driver_node/wheels_cmd",
-            WheelsCmdStamped,
-            queue_size=10
+        self.pub_image = rospy.Publisher(
+            f"{self._veh}/augmented_reality_basics_node/{self.map_file}/image/compressed",
+            CompressedImage
         )
-        self.pub_executed_cmd = rospy.Publisher(
-            f"/{self._veh}/wheels_driver_node/wheels_cmd_executed",
-            WheelsCmdStamped,
-            queue_size=10
-        )
-        
+
         # Subscribers
-        self.delta_dist_left = rospy.Subscriber(
-            f"{self._veh}/odometry_node/left_wheel_delta",
-            Float32,
-            self.cb_param_update,
-            callback_args="left"
+        self.get_image= rospy.Subscriber(
+            f"{self._veh}/camera_node/image/compressed",CompressedImage,self.cb_image
         )
-        self.delta_dist_right = rospy.Subscriber(
-            f"{self._veh}/odometry_node/right_wheel_delta",
-            Float32,
-            self.cb_param_update,
-            callback_args="right"
-        )
+
+        def cb_image(self,msg):
+            self.image = msg
+            
 
         def readYamlFile(self,fname):
             """
@@ -83,7 +65,31 @@ class DriverNode(DTROS):
                         %(fname, exc), type='fatal')
                 rospy.signal_shutdown()
                 return
+            
+        def process_image(self,msg):
+            raise("NotImplementedError")
+        
+        def ground2pixel(self,msg):
+            raise("NotImplementedError")
+
+        def draw_segment(self, image, pt_x, pt_y, color):
+            defined_colors = {
+                'red': ['rgb', [1, 0, 0]],
+                'green': ['rgb', [0, 1, 0]],
+                'blue': ['rgb', [0, 0, 1]],
+                'yellow': ['rgb', [1, 1, 0]],
+                'magenta': ['rgb', [1, 0 , 1]],
+                'cyan': ['rgb', [0, 1, 1]],
+                'white': ['rgb', [1, 1, 1]],
+                'black': ['rgb', [0, 0, 0]]}
+            color_type, [r, g, b] = defined_colors[color]
+            cv2.line(image, (pt_x[0], pt_y[0]), (pt_x[1], pt_y[1]), (b * 255, g * 255, r * 255), 5)
+            return image
+
+        def render_segments(self,msg):
+            raise("NotImplementedError")
+            
     
 if __name__ == "__main__":
     # Initialize driver node
-    driver = DriverNode("drive", "if_bag", "wf_bag")
+    driver = Augmenter("augmented_reality_basics_node")

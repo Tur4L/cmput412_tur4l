@@ -13,7 +13,7 @@ dt-launchfile-init
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 # launching app
-dt-exec roslaunch augmented_reality_basics augmented_reality_basics.launch
+dt-exec roslaunch augmented_reality_basics augmented_reality_basics.launch map_file:="Map_file" file veh:="$VEHICLE_NAME"
 # dt-exec rosrun move_robot drive.py
 
 # ----------------------------------------------------------------------------
