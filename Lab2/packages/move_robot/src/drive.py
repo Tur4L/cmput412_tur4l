@@ -43,7 +43,7 @@ class DriverNode(DTROS):
         self.prev_left_dist = 0.0
         
         # Initial robot frame and world frame
-        # Initial robot frame
+        # Initial robot framdt-exec roslaunch duckiebot_detection duckiebot_detection_node.launche
         self.irf_x = 0.0
         self.irf_y = 0.0
         self.irf_t = 0.0
@@ -115,11 +115,7 @@ class DriverNode(DTROS):
             String representing the color. By convention, it is fully capitalized.
         """
         msg = String()
-        msg.data = pattern
-        self.srv_led(msg)
-        
-    def to_init_frame(self, dl, dr):
-        """Calculate coordinate w.r.t. initial robot frame."""
+        msg.data = "patterndt-exec roslaunch duckiebot_detection duckiebot_detection_node.launchnate w.r.t. initial robot frame."""
         da = (dl + dr) / 2.
         dt = (dr - dl) / (2 * self._robot_width_half)
 

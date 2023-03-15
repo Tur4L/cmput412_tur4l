@@ -11,7 +11,10 @@ from duckietown_msgs.msg import BoolStamped, VehicleCorners
 from duckietown_msgs.srv import ChangePattern
 from image_geometry import PinholeCameraModel
 from sensor_msgs.msg import CameraInfo
-from std_msgs.msg import String, Float32
+from std_msgs.msg import String
+from std_msgs.msg import Float32
+from math import atan2
+
 
 
 class DuckiebotDistanceNode(DTROS):
@@ -40,6 +43,8 @@ class DuckiebotDistanceNode(DTROS):
         self.last_calc_circle_pattern = None
         self.circlepattern_dist = None
         self.circlepattern = None
+        self.distnace_between_left_and_right = None
+        self.angle = None
         
         # subscribers
         self.sub_centers = rospy.Subscriber("/{}/duckiebot_detection_node/centers".format(self.host), VehicleCorners, self.cb_process_centers, queue_size=1)
@@ -47,9 +52,9 @@ class DuckiebotDistanceNode(DTROS):
             "/{}/camera_node/camera_info".format(self.host), CameraInfo, self.cb_process_camera_info, queue_size=1
         )
 
-
         # publishers
         self.pub_distance_to_robot_ahead = rospy.Publisher("/{}/duckiebot_distance_node/distance".format(self.host), Float32, queue_size=1)
+        self.pub_angle_robot = rospy.Publisher("/{}/duckiebot_distance_node/angle".format(self.host),Float32,queue_size=1)
         self.pcm = PinholeCameraModel()
         
         self.log("Initialization completed")
@@ -109,9 +114,11 @@ class DuckiebotDistanceNode(DTROS):
                     R_inv = np.transpose(R)
                     translation_vector = -np.dot(R_inv, translation_vector)
                     distance_to_vehicle = -translation_vector[2]
+                    angle = atan2(R[2,1],R[1,1])
                     
                     #####publish the distance information to a topic###
                     self.pub_distance_to_robot_ahead.publish(Float32(distance_to_vehicle))
+                    self.pub_angle_robot.publish(Float32(angle))
 
 
                 else:
