@@ -9,10 +9,9 @@ from turbojpeg import TurboJPEG
 import cv2
 import numpy as np
 from duckietown_msgs.msg import WheelsCmdStamped, Twist2DStamped, BoolStamped
-from duckietown_msgs.srv import ChangePattern
 
 ROAD_MASK = [(20, 60, 0), (50, 255, 255)]
-Intersection_MASK = [(0,0,220),(0,0,255)]
+Intersection_MASK = [(0,0,255),(128,128,255)]
 DEBUG = False
 ENGLISH = False
 
@@ -34,13 +33,13 @@ class LaneFollowNode(DTROS):
                                     buff_size="20MB")
         self.vel_pub = rospy.Publisher("/" + self.veh + "/car_cmd_switch_node/cmd",
                                        Twist2DStamped,
-                                       queue_size=10)
+                                       queue_size=1)
         self.pub_vel = rospy.Publisher("/"+self.veh+"/wheels_driver_node/wheels_cmd",
                                     WheelsCmdStamped,
-                                    queue_size=10)
+                                    queue_size=1)
         self.pub_executed_cmd = rospy.Publisher("/"+self.veh+"/wheels_driver_node/wheels_cmd_executed",
                                     WheelsCmdStamped,
-                                    queue_size=10)
+                                    queue_size=1)
         self.detection_sub = rospy.Subscriber("/" + self.veh + "/duckiebot_detection_node/detection",
                                               BoolStamped,
                                               self.cb_detection_update,
@@ -54,15 +53,9 @@ class LaneFollowNode(DTROS):
                                                    self.cb_detection_update,
                                                    callback_args ="det_angle")
         
-        # Service client
-        # rospy.wait_for_service(f"/{self.veh}/led_emitter_node/set_pattern")
-        
-        # self.srv_led = rospy.ServiceProxy(
-        #     f"/{self.veh}/led_emitter_node/set_pattern",
-        #     ChangePattern
-        # )
 
         self.jpeg = TurboJPEG()
+
         self.loginfo("Initialized")
 
         # PID Variables
@@ -71,7 +64,7 @@ class LaneFollowNode(DTROS):
             self.offset = -220
         else:
             self.offset = 220
-        self.velocity = 0.3
+        self.velocity = 0.4
         self.twist = Twist2DStamped(v=self.velocity, omega=0)
 
         self.P = 0.049
@@ -118,18 +111,19 @@ class LaneFollowNode(DTROS):
         self.vel_pub.publish(self.twist)
         
 
-    def callback(self, msg):
 
+    def callback(self, msg):
         img = self.jpeg.decode(msg.data)
         crop = img[300:-1, :, :]
         crop_width = crop.shape[1]
         hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(crop, ROAD_MASK[0], ROAD_MASK[1])
-        intersection = cv2.inRange(crop,Intersection_MASK[0],Intersection_MASK[1])
+        intersection = cv2.inRange(crop, Intersection_MASK[0],Intersection_MASK[1])
+        mask = cv2.inRange(hsv, ROAD_MASK[0], ROAD_MASK[1])
         crop = cv2.bitwise_and(crop, crop, mask=mask)
         contours, hierarchy = cv2.findContours(mask,
                                                cv2.RETR_EXTERNAL,
                                                cv2.CHAIN_APPROX_NONE)
+
         # Search for lane in front
         akif = np.sum(np.nonzero(intersection))
         if akif == 0:
@@ -166,7 +160,6 @@ class LaneFollowNode(DTROS):
     def drive(self):
         if self.duck_detected:
             if self.duck_distance > self.safe_distance:
-                
                 msg = WheelsCmdStamped()
                 msg.header.stamp = rospy.Time.now()
                 msg.vel_left = self.velocity + self.duck_angle
@@ -180,6 +173,8 @@ class LaneFollowNode(DTROS):
                 msg.vel_right = 0
                 self.send_msg(msg)
 
+
+        else:
             if self.proportional is None:
                 self.twist.omega = 0
             else:
@@ -213,8 +208,8 @@ if __name__ == "__main__":
     rate = rospy.Rate(8)  # 8hz
     while not rospy.is_shutdown():
         if node.intersection and not node.intersection_crossed:
-            print("At Intersection")
-            rospy.sleep(3)
+            print("At intersection")
+            rospy.sleep(1)
             node.intersection_crossed = True
 
         else:
