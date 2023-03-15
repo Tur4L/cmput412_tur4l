@@ -64,7 +64,7 @@ class LaneFollowNode(DTROS):
             self.offset = -220
         else:
             self.offset = 220
-        self.velocity = 0.4
+        self.velocity = 0.3
         self.twist = Twist2DStamped(v=self.velocity, omega=0)
 
         self.P = 0.049
@@ -75,7 +75,7 @@ class LaneFollowNode(DTROS):
         self.intersection = False
         self.duck_distance = 0.0
         self.duck_angle = 0.0
-        self.safe_distance = 0.25
+        self.safe_distance = 0.3
         self.intersection_crossed = False
 
         # Shutdown hook
