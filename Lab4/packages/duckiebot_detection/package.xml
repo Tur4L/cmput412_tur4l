@@ -2,10 +2,10 @@
 <package>
   <name>duckiebot_detection</name>
   <version>1.0.0</version>
-  <description>Start Code for Exercise-4</description>
+  <description>Code for Exercise-4</description>
 
-  <maintainer email="zepeng@ualberta.ca"> Xiao </maintainer>
-  <author email="zepeng@ualberta.ca"> Xiao </author>
+  <maintainer email="tural@ualberta.ca"> Xiao </maintainer>
+  <author email="tural@ualberta.ca"> Xiao </author>
 
   <license>GPLv3</license>
 
