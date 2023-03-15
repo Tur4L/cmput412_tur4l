@@ -95,7 +95,6 @@ class DuckiebotDistanceNode(DTROS):
                 cameraMatrix=self.pcm.intrinsicMatrix(),
                 distCoeffs=self.pcm.distortionCoeffs(),
             )
-
             if success:
                 points_reproj, _ = cv2.projectPoints(
                     objectPoints=self.circlepattern,
@@ -114,7 +113,7 @@ class DuckiebotDistanceNode(DTROS):
                     R_inv = np.transpose(R)
                     translation_vector = -np.dot(R_inv, translation_vector)
                     distance_to_vehicle = -translation_vector[2]
-                    angle = atan2(R[2,1],R[1,1])
+                    angle = atan2(R[1,0],R[0,0])
                     
                     #####publish the distance information to a topic###
                     self.pub_distance_to_robot_ahead.publish(Float32(distance_to_vehicle))

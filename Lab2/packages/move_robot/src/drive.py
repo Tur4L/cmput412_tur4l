@@ -58,10 +58,10 @@ class DriverNode(DTROS):
         self.wf_bag = rosbag.Bag(f"/data/bags/{world_frame_bag_name}.bag", 'w')
 
         # Service client
-        rospy.wait_for_service(f"/{self._veh}/led_emitter_node/set_pattern")
+        rospy.wait_for_service(f"/{self.veh}/led_emitter_node/set_pattern")
         
         self.srv_led = rospy.ServiceProxy(
-            f"/{self._veh}/led_emitter_node/set_pattern",
+            f"/{self.veh}/led_emitter_node/set_pattern",
             ChangePattern
         )
 
@@ -115,7 +115,11 @@ class DriverNode(DTROS):
             String representing the color. By convention, it is fully capitalized.
         """
         msg = String()
-        msg.data = "patterndt-exec roslaunch duckiebot_detection duckiebot_detection_node.launchnate w.r.t. initial robot frame."""
+        msg.data = pattern 
+        self.srv_led(msg)
+
+    def to_init_fram(self,dl,dr):
+        """w.r.t. initial robot frame."""
         da = (dl + dr) / 2.
         dt = (dr - dl) / (2 * self._robot_width_half)
 
@@ -193,7 +197,7 @@ class DriverNode(DTROS):
         self.send_msg(msg)
 
     def move(self, distance, vel_left=0.4, vel_right=0.4, offset=0):
-        """Method to move the robot in straight line for desired distance.
+        """Method to move the robot in straight line for desired distance.z
         
         Arguments
         ---------

@@ -9,8 +9,10 @@ from turbojpeg import TurboJPEG
 import cv2
 import numpy as np
 from duckietown_msgs.msg import WheelsCmdStamped, Twist2DStamped, BoolStamped
+from duckietown_msgs.srv import ChangePattern
 
 ROAD_MASK = [(20, 60, 0), (50, 255, 255)]
+Intersection_MASK = [(0,0,220),(0,0,255)]
 DEBUG = False
 ENGLISH = False
 
@@ -32,7 +34,13 @@ class LaneFollowNode(DTROS):
                                     buff_size="20MB")
         self.vel_pub = rospy.Publisher("/" + self.veh + "/car_cmd_switch_node/cmd",
                                        Twist2DStamped,
-                                       queue_size=1)
+                                       queue_size=10)
+        self.pub_vel = rospy.Publisher("/"+self.veh+"/wheels_driver_node/wheels_cmd",
+                                    WheelsCmdStamped,
+                                    queue_size=10)
+        self.pub_executed_cmd = rospy.Publisher("/"+self.veh+"/wheels_driver_node/wheels_cmd_executed",
+                                    WheelsCmdStamped,
+                                    queue_size=10)
         self.detection_sub = rospy.Subscriber("/" + self.veh + "/duckiebot_detection_node/detection",
                                               BoolStamped,
                                               self.cb_detection_update,
@@ -45,8 +53,16 @@ class LaneFollowNode(DTROS):
                                                    Float32,
                                                    self.cb_detection_update,
                                                    callback_args ="det_angle")
-        self.jpeg = TurboJPEG()
+        
+        # Service client
+        # rospy.wait_for_service(f"/{self.veh}/led_emitter_node/set_pattern")
+        
+        # self.srv_led = rospy.ServiceProxy(
+        #     f"/{self.veh}/led_emitter_node/set_pattern",
+        #     ChangePattern
+        # )
 
+        self.jpeg = TurboJPEG()
         self.loginfo("Initialized")
 
         # PID Variables
@@ -55,7 +71,7 @@ class LaneFollowNode(DTROS):
             self.offset = -220
         else:
             self.offset = 220
-        self.velocity = 0.4
+        self.velocity = 0.3
         self.twist = Twist2DStamped(v=self.velocity, omega=0)
 
         self.P = 0.049
@@ -63,9 +79,11 @@ class LaneFollowNode(DTROS):
         self.last_error = 0
         self.last_time = rospy.get_time()
         self.duck_detected = False
+        self.intersection = False
         self.duck_distance = 0.0
         self.duck_angle = 0.0
-        self.safe_distance = 0.5
+        self.safe_distance = 0.25
+        self.intersection_crossed = False
 
         # Shutdown hook
         rospy.on_shutdown(self.hook)
@@ -86,20 +104,39 @@ class LaneFollowNode(DTROS):
 
 
     def send_msg(self,msg):
-        self.vel_pub
+        self.pub_vel.publish(msg)
+        self.pub_executed_cmd.publish(msg)
+
+    def reset(self):
+        msg = WheelsCmdStamped()
+        msg.vel_left = 0
+        msg.vel_right = 0
+        self.pub_vel.publish(msg)
+
+        self.twist.v = 0
+        self.twist.omega = 0
+        self.vel_pub.publish(self.twist)
         
 
     def callback(self, msg):
+
         img = self.jpeg.decode(msg.data)
         crop = img[300:-1, :, :]
         crop_width = crop.shape[1]
         hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, ROAD_MASK[0], ROAD_MASK[1])
+        mask = cv2.inRange(crop, ROAD_MASK[0], ROAD_MASK[1])
+        intersection = cv2.inRange(crop,Intersection_MASK[0],Intersection_MASK[1])
         crop = cv2.bitwise_and(crop, crop, mask=mask)
         contours, hierarchy = cv2.findContours(mask,
                                                cv2.RETR_EXTERNAL,
                                                cv2.CHAIN_APPROX_NONE)
         # Search for lane in front
+        akif = np.sum(np.nonzero(intersection))
+        if akif == 0:
+            self.intersection = False
+        else:
+            self.intersection = True
+
         max_area = 20
         max_idx = -1
         for i in range(len(contours)):
@@ -129,20 +166,20 @@ class LaneFollowNode(DTROS):
     def drive(self):
         if self.duck_detected:
             if self.duck_distance > self.safe_distance:
-                self.twist.omega = self.duck_angle
-                self.twist.v = self.velocity
-                self.last_time = rospy.get_time()
-
-                self.vel_pub.publish(self.twist)
+                
+                msg = WheelsCmdStamped()
+                msg.header.stamp = rospy.Time.now()
+                msg.vel_left = self.velocity + self.duck_angle
+                msg.vel_right = self.velocity
+                self.send_msg(msg)
 
             else:
-                self.twist.v = 0
-                self.twist.omega = 0
-                self.last_time = rospy.get_time()
+                msg = WheelsCmdStamped()
+                msg.header.stamp = rospy.Time.now()
+                msg.vel_left = 0
+                msg.vel_right = 0
+                self.send_msg(msg)
 
-                self.vel_pub.publish(self.twist)
-
-        else:
             if self.proportional is None:
                 self.twist.omega = 0
             else:
@@ -175,5 +212,13 @@ if __name__ == "__main__":
     node = LaneFollowNode("lanefollow_node")
     rate = rospy.Rate(8)  # 8hz
     while not rospy.is_shutdown():
+        if node.intersection and not node.intersection_crossed:
+            print("At Intersection")
+            rospy.sleep(3)
+            node.intersection_crossed = True
+
+        else:
+            node.intersection_crossed = False
+
         node.drive()
         rate.sleep()
