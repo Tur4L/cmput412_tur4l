@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import numpy as np
 import os
 import math
@@ -18,11 +19,12 @@ class Digit_Detection(DTROS):
 
         self.sub = rospy.Subscriber(f'/{HOST_NAME}/camera_node/image/compressed', CompressedImage, self.callback)
         self.pub = rospy.Publisher(f'/{HOST_NAME}/april_tag_node/compressed', CompressedImage, queue_size=10)
+        self.veh = str(os.environ["VEHICLE_NAME"])
 
         self.image = None
         self.model = None
 
-        mnist = tf.keras.dataset.mnist
+        mnist = tf.keras.datasets.mnist
         (self.x_train,self.y_train),(self.x_test,self.y_test) = mnist.load_data()
         self.x_train = tf.keras.utils.normalize(self.x_train,axis=1)
         self.x_test = tf.keras.utils.normalize(self.x_test,axis=1)
@@ -54,6 +56,3 @@ class Digit_Detection(DTROS):
 
 if __name__ == '__main__':
     digit_node = Digit_Detection("digit_detection_node")
-    digit_node.train_data()
-    digit_node.test_data()
-

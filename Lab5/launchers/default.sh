@@ -13,9 +13,9 @@ dt-launchfile-init
 # NOTE: Use `dt-exec COMMAND` to run the main process (blocking process)
 
 # launching app
-# dt-exec roslaunch ml_node ml_node.launch
-# dt-exec roslaunch lane_following lane_following_node.launch
-dt-exec roslaunch digit_detection digit_detection_node.launch
+# dt-exec roslaunch ml_node ml_node.launch veh:="$VEHICLE_NAME"
+# dt-exec roslaunch lane_following lane_following_node.launch veh:="$VEHICLE_NAME"
+dt-exec roslaunch digit_detection_node digit_detection_node.launch veh:="$VEHICLE_NAME"
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
