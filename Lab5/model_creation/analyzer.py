@@ -17,9 +17,6 @@ import tag_contour
 HOST_NAME = 'csc22913'
 
 
-bag = rosbag.Bag('data.bag')
-
-
 TIME_CUTOFF_MIN = 1675038119 #526362452
 TIME_CUTOFF_MAX = math.inf
 

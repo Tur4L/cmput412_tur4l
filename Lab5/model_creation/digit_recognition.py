@@ -47,24 +47,24 @@ class Recognizer:
             self.x_train[i] = cv2.dilate(self.x_train[i], np.ones((3, 3), np.uint8), iterations=1)
             # plt_showim(self.x_train[i])
 
-        with open('../dataset_model/TMNIST_Data.csv', 'r') as tminst:
-            lines = tminst.readlines()
-            x_train = np.zeros((len(lines), 28, 28), dtype=np.uint8)
-            y_train = np.zeros(len(lines))
-            for l in range(1, len(lines)):
-                line = lines[l]
-                words = line.split(',')[-(28 * 28 + 1):]  # some font name will contain ',' character
-                label = int(words[0])
-                for i in range(28):
-                    for j in range(28):
-                        idx = i * 28 + j + 1
-                        x_train[l][i][j] = int(words[idx])
-                y_train[l] = label
+        # with open('../dataset_model/TMNIST_Data.csv', 'r') as tminst:
+        #     lines = tminst.readlines()
+        #     x_train = np.zeros((len(lines), 28, 28), dtype=np.uint8)
+        #     y_train = np.zeros(len(lines))
+        #     for l in range(1, len(lines)):
+        #         line = lines[l]
+        #         words = line.split(',')[-(28 * 28 + 1):]  # some font name will contain ',' character
+        #         label = int(words[0])
+        #         for i in range(28):
+        #             for j in range(28):
+        #                 idx = i * 28 + j + 1
+        #                 x_train[l][i][j] = int(words[idx])
+        #         y_train[l] = label
                 # plt_showim(self.x_train[l])
             # self.x_train = np.concatenate((self.x_train, x_train), axis=0)
             # self.y_train = np.concatenate((self.y_train, y_train), axis=0)
-            self.x_train_2 = x_train
-            self.y_train_2 = y_train
+            # self.x_train_2 = x_train
+            # self.y_train_2 = y_train
 
         bag = rosbag.Bag('collected_digit.bag')
         label_table = read_dict()
@@ -90,13 +90,21 @@ class Recognizer:
     def train_data(self):
         print("TRAINING THE DATA")
         DROPOUT_RATE = .1
-        self.model = tf.keras.models.Sequential()
-        self.model.add(tf.keras.layers.Flatten(input_shape=(28, 28)))
-        self.model.add(tf.keras.layers.Dense(250, activation="relu"))
-        self.model.add(tf.keras.layers.Dropout(DROPOUT_RATE))
-        self.model.add(tf.keras.layers.Dense(100, activation="relu"))
-        self.model.add(tf.keras.layers.Dense(10, activation="softmax"))
+        base_model = tf.keras.applications.Xception(
+        weights='imagenet',  # Load weights pre-trained on ImageNet.
+        input_shape=(28, 28),
+        include_top=False)  # Do not include the ImageNet classifier at the top.
+        base_model.trainable = False
+        inputs = tf.keras.Input(shape=(28, 28))
+        x = base_model(inputs, training=False)
+        x = tf.keras.layers.Flatten(input_shape=(28, 28))(x)
+        x = tf.keras.layers.Dense(250, activation="relu")(x)
+        x = tf.keras.layers.Dropout(DROPOUT_RATE)(x)
+        x = tf.keras.layers.Dense(100, activation="relu")(x)
+        outputs = tf.keras.layers.Dense(10, activation="softmax")(x)
         print("Number of layers in the base model: ", len(self.model.layers))
+
+        self.model = tf.keras.Model(inputs, outputs)
 
         self.model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
@@ -123,7 +131,9 @@ class Recognizer:
         aug_train_x = np.concatenate((self.x_train, self.x_train_2, self.x_train_3))
         aug_train_y = np.concatenate((self.y_train, self.y_train_2, self.y_train_3))
         aug_train_x = tf.keras.utils.normalize(aug_train_x, axis=1)
-        self.model.fit(aug_train_x, aug_train_y, epochs=10)
+        
+        aug_train_x_3 = tf.keras.utils.normalize(self.x_train_3, axis=1)
+        self.model.fit(aug_train_x_3, self.y_train_3, epochs=10)
 
         print("TRAINING IS DONE")
 
@@ -178,3 +188,4 @@ class Recognizer:
                 print(f'true: {label}, predicted: {prediction} path:{path}')
             all += 1
         print(f'accuracy: {correct}/{all}')
+
