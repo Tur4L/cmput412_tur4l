@@ -1,5 +1,5 @@
 # parameters
-ARG REPO_NAME="Final Project: Parking"
+ARG REPO_NAME="pj412"
 ARG DESCRIPTION="Part3 of Final Project"
 ARG MAINTAINER="Tural Bakhtiyarli"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/

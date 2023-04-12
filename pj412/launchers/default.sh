@@ -14,7 +14,8 @@ dt-launchfile-init
 
 # launching app
 dt-exec roslaunch apriltag_node apriltag_node.launch veh:="$VEHICLE_NAME"
-dt-exec roslaunch lane_following lane_following.launch veh:="$VEHICLE_NAME"
+# dt-exec roslaunch lane_following lane_following.launch veh:="$VEHICLE_NAME"
+dt-exec roslaunch parking_node parking_node.launch veh:="$VEHICLE_NAME" parking_slot:="1"
 
 # ----------------------------------------------------------------------------
 # YOUR CODE ABOVE THIS LINE
